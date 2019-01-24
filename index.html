@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <title>US: States</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="center-align">
+            United States
+        </h1>
+        <input type="text" id="filterInput" placeholder="Search for a State">
+        <ul id="states" class="collection with-header"></ul>
+    </div>
+
+    <style>
+        .collection-item {
+            color: rgb(38, 168, 154)
+        }
+    </style>
+
+    <script>
+        window.addEventListener("load", function () {
+            load('./States.json')
+        });
+
+        function loadJSON(file, callback) {
+
+            var xobj = new XMLHttpRequest();
+            xobj.overrideMimeType("application/json");
+            xobj.open('GET', file, true); // Replace 'my_data' with the path to your file
+            xobj.onreadystatechange = function () {
+                if (xobj.readyState == 4 && xobj.status == "200") {
+                    // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+                    callback(xobj.responseText);
+                }
+            };
+            xobj.send(null);
+        }
+
+        function load(fileName) {
+
+            loadJSON(fileName, function (response) {
+
+                var states = JSON.parse(response);
+
+                for (let i = 0; i < Object.keys(states).length; i++) {
+
+                    if (i == 0 || states[i].name.charAt(0) > states[i-1].name.charAt(0)) {
+                        let li_head = document.createElement('li');
+                        li_head.className = 'collection-header';
+                        li_head.innerHTML = states[i].name.charAt(0);
+                        document.getElementById('states').appendChild(li_head);
+                    }
+                    let li = document.createElement('li');
+                    li.className = 'collection-item';
+                    li.innerHTML = states[i].name;
+                    document.getElementById('states').appendChild(li);
+                }
+            });
+        }
+    </script>
+
+    <script>
+        let filterInput = document.getElementById('filterInput');
+        filterInput.addEventListener('keyup', filterNames)
+
+        function filterNames() {
+
+            let filterValue = document.getElementById('filterInput').value.toUpperCase();
+
+            let ul = document.getElementById('states');
+
+            let li = ul.querySelectorAll('li.collection-item');
+
+            console.log(filterValue);
+            for (let i = 0; i < li.length; i++) {
+                
+                if (li[i].innerHTML.toUpperCase().indexOf(filterValue) > -1) {
+                    li[i].style.display = '';
+                } else {
+                    li[i].style.display = 'none';
+                }
+            }
+
+        }
+    </script>
+</body>
+
+</html>
